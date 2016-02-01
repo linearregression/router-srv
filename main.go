@@ -16,7 +16,12 @@ func main() {
 		micro.Version("latest"),
 	)
 
-	service.Init()
+	service.Init(
+		micro.BeforeStart(func() error {
+			router.Init(service)
+			return nil
+		}),
+	)
 
 	proto.RegisterRouterHandler(service.Server(), new(handler.Router))
 

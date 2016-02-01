@@ -35,7 +35,10 @@ message SelectRequest {
 }
 
 message SelectResponse {
-	repeated Node nodes = 1;
+	// returns a list services since we have name/version
+	repeated Service services = 1;
+	// timestamp at which this list expires
+	int64 expires = 2;
 }
 
 message MarkRequest {
