@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+import "github.com/micro/go-platform/router/proto/router.proto";
+
+service Router {
+	rpc Stats(StatsRequest) returns (StatsResponse) {}
+	rpc Select(SelectRequest) returns (SelectResponse) {}
+	rpc Mark(MarkRequest) returns (MarkResponse) {}
+}
+
+message Filter {
+	Expression version = 1;
+	repeated Expression metadata = 2;
+}
+
+message Expression {
+	string key = 1;
+	string value = 2;
+	// equals, not equals
+	string operator = 3;
+}
+
+message StatsRequest {
+	string service = 1;
+	string node_id = 2;
+}
+
+message StatsResponse {
+	repeated Stats stats = 1;
+}
+
+message SelectRequest {
+	string service = 1;
+	repeated Filter filter = 2;
+}
+
+message SelectResponse {
+	repeated Node nodes = 1;
+}
+
+message MarkRequest {
+	string service = 1;
+	Node node = 2;
+	string error = 3;
+}
+
+message MarkResponse {
+}
