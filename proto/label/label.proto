@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+service Label {
+	rpc Read(ReadRequest) returns (ReadResponse) {}
+	rpc Create(CreateRequest) returns (CreateResponse) {}
+	rpc Update(UpdateRequest) returns (UpdateResponse) {}
+	rpc Delete(DeleteRequest) returns (DeleteResponse) {}
+	rpc Search(SearchRequest) returns (SearchResponse) {}
+}
+
+message LabelSet {
+	string id = 1;
+
+	// the service name
+	string service = 2;
+
+	// optional: service version
+	string version = 3;
+
+	// weight between 0 and 100
+	// 0 removes the key-value from all nodes
+	// 100 adds the key-value to all nodes
+	// or nodes specified with node_ids
+	int64 weight = 4;
+
+	// optional: priority of this label
+	// 0 is highest
+	int64 priority = 5;
+
+	// label name
+	string key = 6;
+	// label value
+	string value = 7;
+}
+
+message ReadRequest {
+	string id = 1;
+}
+
+message ReadResponse {
+	LabelSet label = 1;
+}
+
+message CreateRequest {
+	LabelSet label = 1;
+}
+
+message CreateResponse {
+}
+
+message UpdateRequest {
+	LabelSet label = 1;
+}
+
+message UpdateResponse {
+}
+
+message DeleteRequest {
+	string id = 1;
+}
+
+message DeleteResponse {
+}
+
+message SearchRequest {
+	// optional params
+	string service = 1;
+	string key = 2;
+	int64 limit = 3;
+	int64 offset = 4;
+}
+
+message SearchResponse {
+	repeated LabelSet labels = 1;
+}
