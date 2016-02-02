@@ -6,6 +6,7 @@ service Router {
 	rpc Stats(StatsRequest) returns (StatsResponse) {}
 	rpc Select(SelectRequest) returns (SelectResponse) {}
 	rpc Mark(MarkRequest) returns (MarkResponse) {}
+	rpc SelectStream(SelectRequest) returns (stream SelectResponse) {}
 }
 
 message Filter {

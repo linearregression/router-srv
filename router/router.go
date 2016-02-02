@@ -6,6 +6,7 @@ import (
 
 	"github.com/micro/go-micro"
 	"github.com/micro/go-micro/registry"
+	"github.com/micro/go-micro/selector"
 	proto "github.com/micro/go-platform/router/proto"
 	"golang.org/x/net/context"
 )
@@ -24,13 +25,17 @@ type router struct {
 	window int
 
 	r registry.Registry
+
+	mtx      sync.Mutex
+	pointers map[string]int
 }
 
 func newRouter() *router {
 	return &router{
-		stats:  make(map[string][]*proto.Stats),
-		window: DefaultWindow,
-		r:      registry.DefaultRegistry,
+		stats:    make(map[string][]*proto.Stats),
+		window:   DefaultWindow,
+		r:        registry.DefaultRegistry,
+		pointers: make(map[string]int),
 	}
 }
 
@@ -75,9 +80,27 @@ func (r *router) Select(service string) ([]*proto.Service, error) {
 		return nil, err
 	}
 
-	var servs []*proto.Service
-	for _, service := range services {
-		servs = append(servs, toProto(service))
+	srvLen := len(services)
+
+	if srvLen == 0 {
+		return nil, selector.ErrNotFound
+	}
+
+	r.mtx.Lock()
+	pointer := r.pointers[service]
+	pointer++
+	r.pointers[service] = pointer
+	r.mtx.Unlock()
+
+	servs := make([]*proto.Service, srvLen)
+	i := pointer % srvLen
+
+	for j := 0; j < srvLen; j++ {
+		if i >= srvLen {
+			i = 0
+		}
+		servs[j] = toProto(services[i], pointer)
+		i++
 	}
 
 	return servs, nil

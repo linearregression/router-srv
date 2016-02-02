@@ -21,7 +21,7 @@ func values(v []*registry.Value) []*proto.Value {
 	return vs
 }
 
-func toProto(s *registry.Service) *proto.Service {
+func toProto(s *registry.Service, pointer int) *proto.Service {
 	var endpoints []*proto.Endpoint
 	for _, ep := range s.Endpoints {
 		var request, response *proto.Value
@@ -50,22 +50,34 @@ func toProto(s *registry.Service) *proto.Service {
 		})
 	}
 
-	var nodes []*proto.Node
-
-	for _, node := range s.Nodes {
-		nodes = append(nodes, &proto.Node{
-			Id:       node.Id,
-			Address:  node.Address,
-			Port:     int64(node.Port),
-			Metadata: node.Metadata,
-		})
-	}
-
-	return &proto.Service{
+	service := &proto.Service{
 		Name:      s.Name,
 		Version:   s.Version,
 		Metadata:  s.Metadata,
 		Endpoints: endpoints,
-		Nodes:     nodes,
 	}
+
+	nodeLen := len(s.Nodes)
+	if nodeLen == 0 {
+		return service
+	}
+	i := pointer % nodeLen
+	nodes := make([]*proto.Node, nodeLen)
+
+	for j := 0; j < nodeLen; j++ {
+		if i >= nodeLen {
+			i = 0
+		}
+		node := s.Nodes[i]
+		nodes[j] = &proto.Node{
+			Id:       node.Id,
+			Address:  node.Address,
+			Port:     int64(node.Port),
+			Metadata: node.Metadata,
+		}
+		i++
+	}
+
+	service.Nodes = nodes
+	return service
 }
