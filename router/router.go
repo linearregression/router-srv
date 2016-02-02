@@ -73,8 +73,7 @@ func (r *router) Select(service string) ([]*proto.Service, error) {
 		return nil, errors.New("invalid service")
 	}
 
-	// TODO: retrieve from the cache
-
+	// TODO: cache records or watch for updates
 	services, err := r.r.GetService(service)
 	if err != nil {
 		return nil, err
@@ -85,6 +84,9 @@ func (r *router) Select(service string) ([]*proto.Service, error) {
 	if srvLen == 0 {
 		return nil, selector.ErrNotFound
 	}
+
+	// TODO: use stats to assign weights to nodes
+	// rather than just arbitrary pointer selection
 
 	r.mtx.Lock()
 	pointer := r.pointers[service]
