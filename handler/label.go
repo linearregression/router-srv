@@ -46,6 +46,10 @@ func (r *Label) Create(ctx context.Context, req *proto.CreateRequest, rsp *proto
 		return errors.BadRequest("go.micro.srv.router.Create", "invalid key")
 	}
 
+	if req.Label.Weight < 0 || req.Label.Weight > 100 {
+		return errors.BadRequest("go.micro.srv.router.Create", "invalid weight, must be 0 to 100")
+	}
+
 	if err := label.Create(req.Label); err != nil {
 		return errors.InternalServerError("go.micro.srv.router.Create", err.Error())
 	}
@@ -68,6 +72,10 @@ func (r *Label) Update(ctx context.Context, req *proto.UpdateRequest, rsp *proto
 
 	if len(req.Label.Key) == 0 {
 		return errors.BadRequest("go.micro.srv.router.Update", "invalid key")
+	}
+
+	if req.Label.Weight < 0 || req.Label.Weight > 100 {
+		return errors.BadRequest("go.micro.srv.router.Update", "invalid weight, must be 0 to 100")
 	}
 
 	if err := label.Update(req.Label); err != nil {

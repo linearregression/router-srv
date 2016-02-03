@@ -8,6 +8,7 @@ import (
 	"github.com/micro/go-micro/registry"
 	"github.com/micro/go-micro/selector"
 	proto "github.com/micro/go-platform/router/proto"
+	"github.com/micro/router-srv/label"
 	"golang.org/x/net/context"
 )
 
@@ -85,9 +86,19 @@ func (r *router) Select(service string) ([]*proto.Service, error) {
 		return nil, selector.ErrNotFound
 	}
 
+	// grab dynamic runtime labels
+	// argh all the labels
+	// bad bad bad, don't use 1000
+	// TODO: fix
+	labels, err := label.Search(service, "", 1000, 0)
+	if err != nil {
+		return nil, err
+	}
+
 	// TODO: use stats to assign weights to nodes
 	// rather than just arbitrary pointer selection
 
+	// get the pointer and increment it
 	r.mtx.Lock()
 	pointer := r.pointers[service]
 	pointer++
@@ -95,12 +106,21 @@ func (r *router) Select(service string) ([]*proto.Service, error) {
 	r.mtx.Unlock()
 
 	servs := make([]*proto.Service, srvLen)
+
+	// create starting point based on pointer and length of services
 	i := pointer % srvLen
 
+	// iterate through the length of the services
 	for j := 0; j < srvLen; j++ {
+		// if the pointer has dropped past length rotate back through
 		if i >= srvLen {
 			i = 0
 		}
+
+		// apply the label
+		label.Apply(labels, services[i])
+
+		// save the service, pass pointer toProto so it can rotate too
 		servs[j] = toProto(services[i], pointer)
 		i++
 	}
