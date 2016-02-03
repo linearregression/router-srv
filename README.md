@@ -39,4 +39,11 @@ Router server implements the following RPC Methods
 Router
 - Stats
 - Select
-- Mark
+- SelectStream
+
+Label
+- Read
+- Create
+- Update
+- Delete
+- Search
