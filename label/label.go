@@ -95,7 +95,7 @@ func Apply(labels []*label.LabelSet, s *registry.Service) {
 			// Apply to nodes
 			for _, node := range s.Nodes {
 				// Apply based on the weight
-				if rand.Int63n(100) < label.Weight {
+				if rand.Int63n(100) <= label.Weight {
 					if node.Metadata == nil {
 						node.Metadata = make(map[string]string)
 					}

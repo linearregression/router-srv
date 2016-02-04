@@ -1,6 +1,8 @@
 syntax = "proto3";
 
-service Label {
+package rule;
+
+service Rule {
 	rpc Read(ReadRequest) returns (ReadResponse) {}
 	rpc Create(CreateRequest) returns (CreateResponse) {}
 	rpc Update(UpdateRequest) returns (UpdateResponse) {}
@@ -8,13 +10,13 @@ service Label {
 	rpc Search(SearchRequest) returns (SearchResponse) {}
 }
 
-message LabelSet {
+message RuleSet {
 	string id = 1;
 
-	// the service name
+	// service name
 	string service = 2;
 
-	// optional: service version
+	// service version
 	string version = 3;
 
 	// weight between 0 and 100
@@ -22,9 +24,13 @@ message LabelSet {
 	// 100 adds the key-value to all nodes
 	int64 weight = 4;
 
-	// optional: priority of this label
+	// optional: priority of this rule
 	// 0 is highest
 	int64 priority = 5;
+
+	// optional: apply the rule against nodes with 
+	// the specific label key/value. weight and 
+	// priority are still in play here.
 
 	// label name
 	string key = 6;
@@ -37,18 +43,18 @@ message ReadRequest {
 }
 
 message ReadResponse {
-	LabelSet label = 1;
+	RuleSet rule = 1;
 }
 
 message CreateRequest {
-	LabelSet label = 1;
+	RuleSet rule = 1;
 }
 
 message CreateResponse {
 }
 
 message UpdateRequest {
-	LabelSet label = 1;
+	RuleSet rule = 1;
 }
 
 message UpdateResponse {
@@ -64,11 +70,11 @@ message DeleteResponse {
 message SearchRequest {
 	// optional params
 	string service = 1;
-	string key = 2;
+	string version = 2;
 	int64 limit = 3;
 	int64 offset = 4;
 }
 
 message SearchResponse {
-	repeated LabelSet labels = 1;
+	repeated RuleSet rules = 1;
 }

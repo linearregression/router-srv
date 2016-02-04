@@ -10,8 +10,9 @@ import (
 	"github.com/micro/router-srv/handler"
 	"github.com/micro/router-srv/router"
 
-	proto2 "github.com/micro/router-srv/proto/label"
+	"github.com/micro/router-srv/proto/label"
 	proto "github.com/micro/router-srv/proto/router"
+	"github.com/micro/router-srv/proto/rule"
 )
 
 func main() {
@@ -42,7 +43,8 @@ func main() {
 	)
 
 	proto.RegisterRouterHandler(service.Server(), new(handler.Router))
-	proto2.RegisterLabelHandler(service.Server(), new(handler.Label))
+	label.RegisterLabelHandler(service.Server(), new(handler.Label))
+	rule.RegisterRuleHandler(service.Server(), new(handler.Rule))
 
 	// subcriber to stats
 	service.Server().Subscribe(service.Server().NewSubscriber(router.StatsTopic, router.ProcessStats))

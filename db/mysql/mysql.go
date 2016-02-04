@@ -9,6 +9,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/micro/router-srv/db"
 	"github.com/micro/router-srv/proto/label"
+	"github.com/micro/router-srv/proto/rule"
 )
 
 var (
@@ -18,7 +19,7 @@ var (
 
 	q = map[string]string{}
 
-	// account queries
+	// label queries
 	labelQ = map[string]string{
 		"deleteLabel":              "DELETE from %s.%s where id = ? limit 1",
 		"createLabel":              `INSERT into %s.%s (id, service, version, weight, priority, label, value) values (?, ?, ?, ?, ?, ?, ?)`,
@@ -28,6 +29,17 @@ var (
 		"searchLabelService":       "SELECT id, service, version, weight, priority, label, value from %s.%s where service = ? limit ? offset ?",
 		"searchLabelKey":           "SELECT id, service, version, weight, priority, label, value from %s.%s where label = ? limit ? offset ?",
 		"searchLabelServiceAndKey": "SELECT id, service, version, weight, priority, label, value from %s.%s  where service = ? and label = ? limit ? offset ?",
+	}
+
+	// rule queries
+	ruleQ = map[string]string{
+		"deleteRule":                  "DELETE from %s.%s where id = ? limit 1",
+		"createRule":                  `INSERT into %s.%s (id, service, version, weight, priority, label, value) values (?, ?, ?, ?, ?, ?, ?)`,
+		"updateRule":                  "UPDATE %s.%s set service = ?, version = ?, weight = ?, priority = ?, label = ?, value = ? where id = ?",
+		"readRule":                    "SELECT id, service, version, weight, priority, label, value from %s.%s where id = ? limit 1",
+		"searchRule":                  "SELECT id, service, version, weight, priority, label, value from %s.%s limit ? offset ?",
+		"searchRuleService":           "SELECT id, service, version, weight, priority, label, value from %s.%s where service = ? limit ? offset ?",
+		"searchRuleServiceAndVersion": "SELECT id, service, version, weight, priority, label, value from %s.%s  where service = ? and version = ? limit ? offset ?",
 	}
 
 	st = map[string]*sql.Stmt{}
@@ -70,9 +82,20 @@ func (m *mysql) Init() error {
 	if _, err = d.Exec(labelSchema); err != nil {
 		return err
 	}
+	if _, err = d.Exec(ruleSchema); err != nil {
+		return err
+	}
 
 	for query, statement := range labelQ {
 		prepared, err := d.Prepare(fmt.Sprintf(statement, database, "labels"))
+		if err != nil {
+			return err
+		}
+		st[query] = prepared
+	}
+
+	for query, statement := range ruleQ {
+		prepared, err := d.Prepare(fmt.Sprintf(statement, database, "rules"))
 		if err != nil {
 			return err
 		}
@@ -152,4 +175,72 @@ func (m *mysql) SearchLabel(service, key string, limit, offset int64) ([]*label.
 	}
 
 	return labels, nil
+}
+
+func (m *mysql) DeleteRule(id string) error {
+	_, err := st["deleteRule"].Exec(id)
+	return err
+}
+
+func (m *mysql) CreateRule(r *rule.RuleSet) error {
+	_, err := st["createRule"].Exec(r.Id, r.Service, r.Version, r.Weight, r.Priority, r.Key, r.Value)
+	return err
+}
+
+func (m *mysql) UpdateRule(r *rule.RuleSet) error {
+	_, err := st["updateRule"].Exec(r.Service, r.Version, r.Weight, r.Priority, r.Key, r.Value, r.Id)
+	return err
+}
+
+func (m *mysql) ReadRule(id string) (*rule.RuleSet, error) {
+	r := &rule.RuleSet{}
+
+	row := st["readRule"].QueryRow(id)
+	// we dont return salt or secret
+	if err := row.Scan(&r.Id, &r.Service, &r.Version, &r.Weight, &r.Priority, &r.Key, &r.Value); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, db.ErrNotFound
+		}
+		return nil, err
+	}
+
+	return r, nil
+}
+
+func (m *mysql) SearchRule(service, version string, limit, offset int64) ([]*rule.RuleSet, error) {
+	var rows *sql.Rows
+	var err error
+
+	if len(service) > 0 && len(version) > 0 {
+		rows, err = st["searchRuleServiceAndVersion"].Query(service, version, limit, offset)
+	} else if len(service) > 0 {
+		rows, err = st["searchRuleService"].Query(service, limit, offset)
+	} else {
+		rows, err = st["searchRule"].Query(limit, offset)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var rules []*rule.RuleSet
+
+	for rows.Next() {
+		r := &rule.RuleSet{}
+		if err := rows.Scan(&r.Id, &r.Service, &r.Version, &r.Weight, &r.Priority, &r.Key, &r.Value); err != nil {
+			if err == sql.ErrNoRows {
+				return nil, db.ErrNotFound
+			}
+			return nil, err
+		}
+
+		rules = append(rules, r)
+
+	}
+	if rows.Err() != nil {
+		return nil, err
+	}
+
+	return rules, nil
 }

@@ -15,12 +15,12 @@ type Router struct{}
 
 func (r *Router) Stats(ctx context.Context, req *proto.StatsRequest, rsp *proto.StatsResponse) error {
 	if len(req.Service) == 0 {
-		return errors.BadRequest("go.micro.srv.router.Stats", "invalid service name")
+		return errors.BadRequest("go.micro.srv.router.Router.Stats", "invalid service name")
 	}
 
 	stats, err := router.Stats(req.Service, req.NodeId)
 	if err != nil {
-		return errors.InternalServerError("go.micro.srv.router.Stats", err.Error())
+		return errors.InternalServerError("go.micro.srv.router.Router.Stats", err.Error())
 	}
 
 	rsp.Stats = stats
@@ -32,14 +32,14 @@ func (r *Router) Select(ctx context.Context, req *proto.SelectRequest, rsp *prot
 	// TODO: process filters
 
 	if len(req.Service) == 0 {
-		return errors.BadRequest("go.micro.srv.router.Select", "invalid service name")
+		return errors.BadRequest("go.micro.srv.router.Router.Select", "invalid service name")
 	}
 
 	services, err := router.Select(req.Service)
 	if err != nil && err == selector.ErrNotFound {
-		return errors.NotFound("go.micro.srv.router.Select", err.Error())
+		return errors.NotFound("go.micro.srv.router.Router.Select", err.Error())
 	} else if err != nil {
-		return errors.InternalServerError("go.micro.srv.router.Select", err.Error())
+		return errors.InternalServerError("go.micro.srv.router.Router.Select", err.Error())
 	}
 
 	rsp.Services = services
@@ -56,7 +56,7 @@ func (r *Router) SelectStream(ctx context.Context, req *proto.SelectRequest, str
 	// TODO: process filters
 
 	if len(req.Service) == 0 {
-		return errors.BadRequest("go.micro.srv.router.Select", "invalid service name")
+		return errors.BadRequest("go.micro.srv.router.Router.Select", "invalid service name")
 	}
 
 	t := time.NewTicker(time.Duration(router.DefaultExpiry) * time.Second)
@@ -65,9 +65,9 @@ func (r *Router) SelectStream(ctx context.Context, req *proto.SelectRequest, str
 	for {
 		services, err := router.Select(req.Service)
 		if err != nil && err == selector.ErrNotFound {
-			return errors.NotFound("go.micro.srv.router.SelectStream", err.Error())
+			return errors.NotFound("go.micro.srv.router.Router.SelectStream", err.Error())
 		} else if err != nil {
-			return errors.InternalServerError("go.micro.srv.router.SelectStream", err.Error())
+			return errors.InternalServerError("go.micro.srv.router.Router.SelectStream", err.Error())
 		}
 
 		if err := stream.Send(&proto.SelectResponse{

@@ -9,6 +9,7 @@ import (
 	"github.com/micro/go-micro/selector"
 	proto "github.com/micro/go-platform/router/proto"
 	"github.com/micro/router-srv/label"
+	"github.com/micro/router-srv/rule"
 	"golang.org/x/net/context"
 )
 
@@ -89,8 +90,16 @@ func (r *router) Select(service string) ([]*proto.Service, error) {
 	// grab dynamic runtime labels
 	// argh all the labels
 	// bad bad bad, don't use 1000
-	// TODO: fix
+	// TODO: fix. also cache
 	labels, err := label.Search(service, "", 1000, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	// grab manually defined rules
+	// these are overrides to load balancing
+	// TODO: cache. also fix
+	rules, err := rule.Search(service, "", 1000, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +134,27 @@ func (r *router) Select(service string) ([]*proto.Service, error) {
 		i++
 	}
 
-	return servs, nil
+	// we've load balanced the nodes
+	// now lets strip based on manual overrides
+
+	// TODO: accept label overrides
+	// Rules:
+	// service A version latest weight 0 priority 0
+	// service A version latest weight 100 priority 0 key=foo value=bar
+	// if a Select provides the label foo=bar then we'll return it
+	// even where previously the weight was set to 0
+	var final []*proto.Service
+
+	// TODO: should be provided as params to this method
+	userSelectLabels := map[string]string{}
+
+	for _, service := range servs {
+		if s := rule.Apply(rules, service, userSelectLabels); s != nil {
+			final = append(final, s)
+		}
+	}
+
+	return final, nil
 }
 
 func (r *router) Stats(service, nodeId string) ([]*proto.Stats, error) {

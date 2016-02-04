@@ -12,4 +12,15 @@ value varchar(255),
 index(service),
 index(priority),
 index(label));`
+
+	ruleSchema = `CREATE TABLE IF NOT EXISTS rules (
+id varchar(36) primary key,
+service varchar(1024),
+version varchar(255),
+weight int(11),
+priority int(11),
+label varchar(255),
+value varchar(255),
+index(service, version),
+index(priority));`
 )
