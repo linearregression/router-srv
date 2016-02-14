@@ -8,8 +8,8 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/micro/router-srv/db"
-	"github.com/micro/router-srv/proto/label"
-	"github.com/micro/router-srv/proto/rule"
+	label "github.com/micro/router-srv/proto/label"
+	rule "github.com/micro/router-srv/proto/rule"
 )
 
 var (

@@ -10,9 +10,9 @@ import (
 	"github.com/micro/router-srv/handler"
 	"github.com/micro/router-srv/router"
 
-	"github.com/micro/router-srv/proto/label"
+	label "github.com/micro/router-srv/proto/label"
 	proto "github.com/micro/router-srv/proto/router"
-	"github.com/micro/router-srv/proto/rule"
+	rule "github.com/micro/router-srv/proto/rule"
 )
 
 func main() {

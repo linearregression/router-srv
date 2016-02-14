@@ -7,7 +7,7 @@ import (
 
 	proto "github.com/micro/go-platform/router/proto"
 	"github.com/micro/router-srv/db"
-	"github.com/micro/router-srv/proto/rule"
+	rule "github.com/micro/router-srv/proto/rule"
 )
 
 // Using rule package as rules may be cached later on

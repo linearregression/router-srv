@@ -7,7 +7,7 @@ import (
 
 	"github.com/micro/go-micro/registry"
 	"github.com/micro/router-srv/db"
-	"github.com/micro/router-srv/proto/label"
+	label "github.com/micro/router-srv/proto/label"
 )
 
 // Using label package as labels may be cached later on

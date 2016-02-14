@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package go.micro.srv.router.label;
+
 service Label {
 	rpc Read(ReadRequest) returns (ReadResponse) {}
 	rpc Create(CreateRequest) returns (CreateResponse) {}

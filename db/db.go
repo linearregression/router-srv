@@ -3,8 +3,8 @@ package db
 import (
 	"errors"
 
-	"github.com/micro/router-srv/proto/label"
-	"github.com/micro/router-srv/proto/rule"
+	label "github.com/micro/router-srv/proto/label"
+	rule "github.com/micro/router-srv/proto/rule"
 )
 
 type DB interface {

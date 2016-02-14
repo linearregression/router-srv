@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package rule;
+package go.micro.srv.router.rule;
 
 service Rule {
 	rpc Read(ReadRequest) returns (ReadResponse) {}

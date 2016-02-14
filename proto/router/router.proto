@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package go.micro.srv.router.router;
+
 import "github.com/micro/go-platform/router/proto/router.proto";
 
 service Router {
