@@ -6,6 +6,10 @@ environment and route appropriately.
 
 The router also provides weighted and label based routing.
 
+<p align="center">
+  <img src="https://github.com/micro/go-platform/blob/master/doc/router.png" />
+</p>
+
 ## Getting started
 
 1. Install Consul
