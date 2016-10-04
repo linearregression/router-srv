@@ -7,7 +7,7 @@ import (
 	"github.com/micro/go-micro"
 	"github.com/micro/go-micro/registry"
 	"github.com/micro/go-micro/selector"
-	proto "github.com/micro/go-platform/router/proto"
+	proto "github.com/micro/go-os/router/proto"
 	"github.com/micro/router-srv/label"
 	"github.com/micro/router-srv/rule"
 	"golang.org/x/net/context"

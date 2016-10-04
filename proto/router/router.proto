@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package go.micro.srv.router.router;
 
-import "github.com/micro/go-platform/router/proto/router.proto";
+import "github.com/micro/go-os/router/proto/router.proto";
 
 service Router {
 	rpc Stats(StatsRequest) returns (StatsResponse) {}
@@ -29,7 +29,7 @@ message StatsRequest {
 }
 
 message StatsResponse {
-	repeated Stats stats = 1;
+	repeated go.micro.os.router.Stats stats = 1;
 }
 
 message SelectRequest {
@@ -39,14 +39,14 @@ message SelectRequest {
 
 message SelectResponse {
 	// returns a list services since we have name/version
-	repeated Service services = 1;
+	repeated go.micro.os.router.Service services = 1;
 	// timestamp at which this list expires
 	int64 expires = 2;
 }
 
 message MarkRequest {
 	string service = 1;
-	Node node = 2;
+	go.micro.os.router.Node node = 2;
 	string error = 3;
 }
 

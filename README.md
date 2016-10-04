@@ -4,10 +4,10 @@ Router server provides global routing capabilities. It is not a proxy. It has th
 and offloads actual routing to smart clients. Its job is to maintain routing information about the 
 environment and route appropriately.
 
-The router also provides weighted and label based routing. The client side library is [go-platform/router](https://github.com/micro/go-platform/tree/master/router).
+The router also provides weighted and label based routing. The client side library is [go-os/router](https://github.com/micro/go-os/tree/master/router).
 
 <p align="center">
-  <img src="https://github.com/micro/go-platform/blob/master/doc/router.png" />
+  <img src="https://github.com/micro/go-os/blob/master/doc/router.png" />
 </p>
 
 ## Getting started

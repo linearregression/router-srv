@@ -5,7 +5,7 @@ import (
 	"sort"
 	"time"
 
-	proto "github.com/micro/go-platform/router/proto"
+	proto "github.com/micro/go-os/router/proto"
 	"github.com/micro/router-srv/db"
 	rule "github.com/micro/router-srv/proto/rule"
 )
